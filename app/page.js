@@ -14,8 +14,12 @@ export default async function Home() {
     <>
       <header>
         <div className="wrap nav">
-  <div className="logo">Médenine <em>Immo</em></div>
-<a href="/gerer" style={{ border: '1px solid var(--line)', padding: '9px 20px', fontSize: '0.85rem', marginRight: 10 }}>تسيير</a></div>
+          <div className="logo">Médenine <em>Immo</em></div>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <a href="/gerer" style={{ border: '1px solid var(--line)', padding: '9px 20px', fontSize: '0.85rem' }}>تسيير</a>
+            <a href="/ajouter" style={{ border: '1px solid var(--line)', padding: '9px 20px', fontSize: '0.85rem' }}>+ إضافة عقار</a>
+          </div>
+        </div>
       </header>
 
       <section className="wrap section">
