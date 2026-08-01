@@ -2,12 +2,18 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
-const ADMIN_PASSWORD = 'medenine2026' // نفس كلمة سر /ajouter
+const ADMIN_PASSWORD = 'medenine2026'
 
 export default function GererPage() {
   const [loggedIn, setLoggedIn] = useState(false)
   const [pw, setPw] = useState('')
   const [pwError, setPwError] = useState('')
+
+  useEffect(() => {
+    if (localStorage.getItem('medenine_admin') === 'true') {
+      setLoggedIn(true)
+    }
+  }, [])
 
   const [properties, setProperties] = useState([])
   const [loading, setLoading] = useState(true)
@@ -30,6 +36,7 @@ export default function GererPage() {
     e.preventDefault()
     if (pw === ADMIN_PASSWORD) {
       setLoggedIn(true)
+      localStorage.setItem('medenine_admin', 'true')
       setPwError('')
     } else {
       setPwError('كلمة السر غالطة')
@@ -71,7 +78,7 @@ export default function GererPage() {
         price: Number(editForm.price),
         quartier: editForm.quartier,
         surface: Number(editForm.surface),
-       chambres: Number(editForm.chambres),
+        chambres: Number(editForm.chambres),
         sdb: Number(editForm.sdb),
         description: editForm.description
       })
@@ -86,7 +93,6 @@ export default function GererPage() {
     }
   }
 
-  // شاشة الدخول
   if (!loggedIn) {
     return (
       <div className="wrap section" style={{ maxWidth: 380, textAlign: 'center' }}>
@@ -114,7 +120,6 @@ export default function GererPage() {
         properties.map(p => (
           <div key={p.id} style={{ border: '1px solid var(--line)', padding: 18, marginBottom: 12 }}>
             {editingId === p.id ? (
-              // فورم التعديل
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <input name="title" value={editForm.title || ''} onChange={handleEditChange} style={inputStyle} placeholder="العنوان" />
                 <div style={{ display: 'flex', gap: 10 }}>
@@ -135,7 +140,7 @@ export default function GererPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 10 }}>
                   <input name="surface" type="number" value={editForm.surface || ''} onChange={handleEditChange} style={inputStyle} placeholder="المساحة" />
-                 <input name="chambres" type="number" value={editForm.chambres || ''} onChange={handleEditChange} style={inputStyle} placeholder="بيوت" />
+                  <input name="chambres" type="number" value={editForm.chambres || ''} onChange={handleEditChange} style={inputStyle} placeholder="بيوت" />
                   <input name="sdb" type="number" value={editForm.sdb || ''} onChange={handleEditChange} style={inputStyle} placeholder="حمامات" />
                 </div>
                 <textarea name="description" value={editForm.description || ''} onChange={handleEditChange} style={{ ...inputStyle, minHeight: 60 }} placeholder="الوصف" />
@@ -145,7 +150,6 @@ export default function GererPage() {
                 </div>
               </div>
             ) : (
-              // عرض عادي
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 14 }}>
                 <div>
                   <strong>{p.title}</strong>
