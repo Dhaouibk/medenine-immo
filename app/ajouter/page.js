@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useRouter } from 'next/navigation'
 
-const ADMIN_PASSWORD = 'medenine2026' // بدّل هذي بكلمة سر خاصة بيك
+const ADMIN_PASSWORD = 'medenine2026'
 
 export default function AjouterPage() {
   const router = useRouter()
@@ -13,8 +13,8 @@ export default function AjouterPage() {
 
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState('')
-  const [imageFile, setImageFile] = useState(null)
-  const [imagePreview, setImagePreview] = useState('')
+  const [imageFiles, setImageFiles] = useState([])
+  const [imagePreviews, setImagePreviews] = useState([])
 
   const [form, setForm] = useState({
     title: '', type: 'Villa', operation: 'location', price: '',
@@ -35,11 +35,10 @@ export default function AjouterPage() {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  function handleImage(e) {
-    const file = e.target.files[0]
-    if (!file) return
-    setImageFile(file)
-    setImagePreview(URL.createObjectURL(file))
+  function handleImages(e) {
+    const files = Array.from(e.target.files)
+    setImageFiles(files)
+    setImagePreviews(files.map(f => URL.createObjectURL(f)))
   }
 
   async function handleSubmit(e) {
@@ -48,13 +47,14 @@ export default function AjouterPage() {
     setMsg('')
 
     try {
-      let imageUrl = null
+      const imageUrls = []
 
-      if (imageFile) {
-        const fileName = `${Date.now()}-${imageFile.name}`
+      // رفع كل صورة وحدة بوحدة
+      for (const file of imageFiles) {
+        const fileName = `${Date.now()}-${file.name}`
         const { error: uploadError } = await supabase.storage
           .from('property-images')
-          .upload(fileName, imageFile)
+          .upload(fileName, file)
 
         if (uploadError) throw uploadError
 
@@ -62,7 +62,7 @@ export default function AjouterPage() {
           .from('property-images')
           .getPublicUrl(fileName)
 
-        imageUrl = publicUrlData.publicUrl
+        imageUrls.push(publicUrlData.publicUrl)
       }
 
       const { error: insertError } = await supabase
@@ -77,7 +77,7 @@ export default function AjouterPage() {
           chambres: Number(form.chambres),
           sdb: Number(form.sdb),
           description: form.description,
-          image_url: imageUrl
+          images: imageUrls
         })
 
       if (insertError) throw insertError
@@ -92,7 +92,6 @@ export default function AjouterPage() {
     }
   }
 
-  // شاشة الدخول
   if (!loggedIn) {
     return (
       <div className="wrap section" style={{ maxWidth: 380, textAlign: 'center' }}>
@@ -101,23 +100,14 @@ export default function AjouterPage() {
           هذي الصفحة خاصة بصاحب الموقع فقط
         </p>
         <form onSubmit={tryLogin} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <input
-            type="password"
-            placeholder="كلمة السر"
-            value={pw}
-            onChange={e => setPw(e.target.value)}
-            style={inputStyle}
-          />
-          <button type="submit" style={{ background: 'var(--ink)', color: '#fff', border: 'none', padding: 12, cursor: 'pointer' }}>
-            دخول
-          </button>
+          <input type="password" placeholder="كلمة السر" value={pw} onChange={e => setPw(e.target.value)} style={inputStyle} />
+          <button type="submit" style={{ background: 'var(--ink)', color: '#fff', border: 'none', padding: 12, cursor: 'pointer' }}>دخول</button>
           {pwError && <div style={{ color: '#B14B3F', fontSize: '0.85rem' }}>{pwError}</div>}
         </form>
       </div>
     )
   }
 
-  // الفورم (بعد تسجيل الدخول)
   return (
     <div className="wrap section" style={{ maxWidth: 560 }}>
       <h2 style={{ marginBottom: 24 }}>إضافة عقار جديد</h2>
@@ -145,10 +135,16 @@ export default function AjouterPage() {
         <textarea name="description" placeholder="الوصف" value={form.description} onChange={handleChange} style={{ ...inputStyle, minHeight: 80 }} />
 
         <div>
-          <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', color: 'var(--soft)' }}>صورة العقار</label>
-          <input type="file" accept="image/*" onChange={handleImage} />
-          {imagePreview && (
-            <img src={imagePreview} alt="preview" style={{ marginTop: 10, height: 140, objectFit: 'cover', width: '100%' }} />
+          <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', color: 'var(--soft)' }}>
+            صور العقار (تنجم تختار عدة صور مرة وحدة)
+          </label>
+          <input type="file" accept="image/*" multiple onChange={handleImages} />
+          {imagePreviews.length > 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginTop: 10 }}>
+              {imagePreviews.map((src, i) => (
+                <img key={i} src={src} alt="" style={{ height: 90, objectFit: 'cover', width: '100%' }} />
+              ))}
+            </div>
           )}
         </div>
 
