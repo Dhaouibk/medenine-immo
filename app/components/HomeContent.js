@@ -45,7 +45,10 @@ export function HomeContent({ properties }) {
                 }}
               >FR</button>
             </div>
-            <a href="/gerer" style={{ border: '1px solid var(--line)', padding: '9px 20px', fontSize: '0.85rem' }}>{t.manage}</a>
+         <a href="/gerer" style={{ border: '1px solid var(--line)', padding: '9px 20px', fontSize: '0.85rem' }}>{t.manage}</a>
+           
+            <a href="/ajouter-client" style={{ border: '1px solid var(--line)', padding: '9px 20px', fontSize: '0.85rem' }}>{t.addClient}</a>
+<a href="/confirmer-clients" style={{ border: '1px solid var(--line)', padding: '9px 20px', fontSize: '0.85rem' }}>{t.clientsList}</a>
             <a href="/ajouter" style={{ border: '1px solid var(--line)', padding: '9px 20px', fontSize: '0.85rem' }}>{t.addProperty}</a>
           </div>
         </div>

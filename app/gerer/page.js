@@ -54,6 +54,20 @@ export default function GererPage() {
     }
   }
 
+  async function toggleDisponible(p) {
+    const { error } = await supabase
+      .from('proprieties')
+      .update({ disponible: !p.disponible })
+      .eq('id', p.id)
+
+    if (error) {
+      setMsg('خطأ: ' + error.message)
+    } else {
+      setMsg(p.disponible ? 'الدار توّة غير معروضة للزوار' : 'الدار توّة معروضة للزوار من جديد ✓')
+      loadProperties()
+    }
+  }
+
   function startEdit(p) {
     setEditingId(p.id)
     setEditForm({ ...p })
@@ -150,14 +164,29 @@ export default function GererPage() {
                 </div>
               </div>
             ) : (
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 14 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
                 <div>
                   <strong>{p.title}</strong>
                   <div style={{ fontSize: '0.85rem', color: 'var(--soft)' }}>
                     {p.quartier} · {p.operation === 'location' ? 'كراء' : 'بيع'} · {Number(p.price).toLocaleString('fr-FR')} د.ت
+                    {' · '}
+                    <span style={{ color: p.disponible === false ? '#B14B3F' : '#3E7A4E', fontWeight: 600 }}>
+                      {p.disponible === false ? 'غير معروضة' : 'معروضة'}
+                    </span>
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    onClick={() => toggleDisponible(p)}
+                    style={{
+                      padding: '8px 16px', border: '1px solid',
+                      borderColor: p.disponible === false ? '#3E7A4E' : '#B14B3F',
+                      color: p.disponible === false ? '#3E7A4E' : '#B14B3F',
+                      background: 'none', cursor: 'pointer', whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {p.disponible === false ? '↩ رجّعها متوفرة' : '🚫 خليها غير متوفرة'}
+                  </button>
                   <button onClick={() => startEdit(p)} style={{ padding: '8px 16px', border: '1px solid var(--line)', background: 'none', cursor: 'pointer' }}>تعديل</button>
                   <button onClick={() => handleDelete(p.id)} style={{ padding: '8px 16px', border: '1px solid #B14B3F', color: '#B14B3F', background: 'none', cursor: 'pointer' }}>حذف</button>
                 </div>
