@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-export default function PropertyList({ properties }) {
+export default function PropertyList({ properties, t }) {
   const [op, setOp] = useState('')
   const [quartier, setQuartier] = useState('')
   const [keyword, setKeyword] = useState('')
@@ -48,29 +48,29 @@ export default function PropertyList({ properties }) {
     <>
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 30, alignItems: 'center' }}>
         <div style={{ display: 'flex', border: '1px solid var(--line)', borderRadius: 2 }}>
-          <button onClick={() => setOp('')} style={{ padding: '9px 18px', border: 'none', background: op === '' ? 'var(--ink)' : 'none', color: op === '' ? '#fff' : 'var(--ink)', cursor: 'pointer' }}>الكل</button>
-          <button onClick={() => setOp('location')} style={{ padding: '9px 18px', border: 'none', background: op === 'location' ? 'var(--ink)' : 'none', color: op === 'location' ? '#fff' : 'var(--ink)', cursor: 'pointer' }}>كراء</button>
-          <button onClick={() => setOp('vente')} style={{ padding: '9px 18px', border: 'none', background: op === 'vente' ? 'var(--ink)' : 'none', color: op === 'vente' ? '#fff' : 'var(--ink)', cursor: 'pointer' }}>بيع</button>
+          <button onClick={() => setOp('')} style={{ padding: '9px 18px', border: 'none', background: op === '' ? 'var(--ink)' : 'none', color: op === '' ? '#fff' : 'var(--ink)', cursor: 'pointer' }}>{t.all}</button>
+          <button onClick={() => setOp('location')} style={{ padding: '9px 18px', border: 'none', background: op === 'location' ? 'var(--ink)' : 'none', color: op === 'location' ? '#fff' : 'var(--ink)', cursor: 'pointer' }}>{t.rent}</button>
+          <button onClick={() => setOp('vente')} style={{ padding: '9px 18px', border: 'none', background: op === 'vente' ? 'var(--ink)' : 'none', color: op === 'vente' ? '#fff' : 'var(--ink)', cursor: 'pointer' }}>{t.sale}</button>
         </div>
 
         <select value={quartier} onChange={e => setQuartier(e.target.value)} style={{ padding: 9, border: '1px solid var(--line)', background: 'var(--bg)' }}>
-          <option value="">كل الحومات</option>
+          <option value="">{t.allNeighborhoods}</option>
           {quartiers.map(q => <option key={q} value={q}>{q}</option>)}
         </select>
 
         <input
           type="text"
-          placeholder="بحث بالعنوان..."
+          placeholder={t.searchPlaceholder}
           value={keyword}
           onChange={e => setKeyword(e.target.value)}
           style={{ padding: 9, border: '1px solid var(--line)', background: 'var(--bg)', flex: 1, minWidth: 160 }}
         />
 
-        <span style={{ fontSize: '0.82rem', color: 'var(--soft)' }}>{filtered.length} عقار</span>
+        <span style={{ fontSize: '0.82rem', color: 'var(--soft)' }}>{filtered.length} {t.property}</span>
       </div>
 
       {filtered.length === 0 ? (
-        <div className="empty">ما فماش عقار يجاوب البحث.</div>
+        <div className="empty">{t.noResults}</div>
       ) : (
         <div>
           {filtered.map((p) => {
@@ -91,14 +91,14 @@ export default function PropertyList({ properties }) {
                 </div>
                 <div>
                   <span className="badge">
-                    {p.operation === 'location' ? 'À louer' : 'À vendre'} · {p.type}
+                    {p.operation === 'location' ? t.forRent : t.forSale} · {p.type}
                   </span>
                   <h3>{p.title}</h3>
                   <div className="loc">{p.quartier}, Médenine</div>
                   <div className="specs">
                     <span>{p.surface} m²</span>
-                    <span>{p.chambres} chambres</span>
-                    <span>{p.sdb} sdb</span>
+                    <span>{p.chambres} {t.rooms}</span>
+                    <span>{p.sdb} {t.bathrooms}</span>
                   </div>
                 </div>
                 <div className="price-col">
@@ -129,12 +129,12 @@ export default function PropertyList({ properties }) {
             }}
           >✕</button>
 
-<div style={{ color: '#fff', marginBottom: 14, fontSize: '0.95rem' }}>{galleryProperty.title}</div>
-{galleryProperty.description && (
-  <div style={{ color: '#5B9BD5', marginBottom: 14, fontSize: '1rem', maxWidth: 500, textAlign: 'center' }}>
-    {galleryProperty.description}
-  </div>
-)}
+          <div style={{ color: '#fff', marginBottom: 14, fontSize: '0.95rem' }}>{galleryProperty.title}</div>
+          {galleryProperty.description && (
+            <div style={{ color: '#5B9BD5', marginBottom: 14, fontSize: '1rem', maxWidth: 500, textAlign: 'center' }}>
+              {galleryProperty.description}
+            </div>
+          )}
           <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '75vh', display: 'flex', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
             {getImages(galleryProperty).length > 1 && (
               <button onClick={prevImage} style={navBtnStyle}>‹</button>

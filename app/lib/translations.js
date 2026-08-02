@@ -1,0 +1,40 @@
+export const translations = {
+  ar: {
+    siteName: 'مدنين',
+    siteNameEnd: 'إيمو',
+    tagline: 'العقارات المتوفرة',
+    kicker: 'مدنين',
+    manage: 'تسيير',
+    addProperty: '+ إضافة عقار',
+    all: 'الكل',
+    rent: 'كراء',
+    sale: 'بيع',
+    allNeighborhoods: 'كل الحومات',
+    searchPlaceholder: 'بحث بالعنوان...',
+    property: 'عقار',
+    noResults: 'ما فماش عقار يجاوب البحث.',
+    forRent: 'À louer',
+    forSale: 'À vendre',
+    rooms: 'chambres',
+    bathrooms: 'sdb'
+  },
+  fr: {
+    siteName: 'Médenine',
+    siteNameEnd: 'Immo',
+    tagline: 'Propriétés disponibles',
+    kicker: 'Médenine',
+    manage: 'Gérer',
+    addProperty: '+ Ajouter un bien',
+    all: 'Tous',
+    rent: 'Louer',
+    sale: 'Vendre',
+    allNeighborhoods: 'Tous les quartiers',
+    searchPlaceholder: 'Rechercher un titre...',
+    property: 'biens',
+    noResults: 'Aucun bien ne correspond à votre recherche.',
+    forRent: 'À louer',
+    forSale: 'À vendre',
+    rooms: 'chambres',
+    bathrooms: 'sdb'
+  }
+}
