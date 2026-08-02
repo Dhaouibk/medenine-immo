@@ -129,8 +129,12 @@ export default function PropertyList({ properties }) {
             }}
           >✕</button>
 
-          <div style={{ color: '#fff', marginBottom: 14, fontSize: '0.95rem' }}>{galleryProperty.title}</div>
-
+<div style={{ color: '#fff', marginBottom: 14, fontSize: '0.95rem' }}>{galleryProperty.title}</div>
+{galleryProperty.description && (
+  <div style={{ color: '#5B9BD5', marginBottom: 14, fontSize: '1rem', maxWidth: 500, textAlign: 'center' }}>
+    {galleryProperty.description}
+  </div>
+)}
           <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '75vh', display: 'flex', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
             {getImages(galleryProperty).length > 1 && (
               <button onClick={prevImage} style={navBtnStyle}>‹</button>
