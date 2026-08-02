@@ -45,9 +45,11 @@ export default function ConfirmerClientsPage() {
   }
 
   async function toggleConfirme(c) {
+    const newConfirme = !c.confirme
+    const newMois = newConfirme ? (c.mois_payes || 0) + 1 : c.mois_payes
     const { error } = await supabase
       .from('clients')
-      .update({ confirme: !c.confirme })
+      .update({ confirme: newConfirme, mois_payes: newMois })
       .eq('id', c.id)
     if (!error) loadClients()
   }
@@ -93,8 +95,11 @@ export default function ConfirmerClientsPage() {
             border: '1px solid var(--line)', padding: 16, marginBottom: 10, gap: 14
           }}>
             <div>
+              <strong>{c.nom}</strong>
               <div style={{ fontSize: '0.85rem', color: 'var(--soft)' }}>
                 📞 {c.telephone} · CIN: {c.cin} · 🏠 {c.property_title}
+                {c.date_debut && ` · 📅 ${new Date(c.date_debut).toLocaleDateString('fr-FR')}`}
+                {' · '}<strong>{c.mois_payes || 0} شهر مدفوع</strong>
               </div>
             </div>
             <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>

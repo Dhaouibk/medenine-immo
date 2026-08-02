@@ -19,7 +19,7 @@ export default function AjouterClientPage() {
 
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState('')
-  const [form, setForm] = useState({ nom: '', telephone: '', cin: '', property_title: '' })
+  const [form, setForm] = useState({ nom: '', telephone: '', cin: '', property_title: '', date_debut: '' })
   const [properties, setProperties] = useState([])
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function AjouterClientPage() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!form.nom || !form.telephone || !form.cin || !form.property_title) {
+   if (!form.nom || !form.telephone || !form.cin || !form.property_title || !form.date_debut) {
       setMsg('عمر كل الخانات.')
       return
     }
@@ -59,6 +59,7 @@ export default function AjouterClientPage() {
       telephone: form.telephone,
       cin: form.cin,
       property_title: form.property_title,
+      date_debut: form.date_debut,
       confirme: false
     })
 
@@ -72,7 +73,7 @@ export default function AjouterClientPage() {
         .eq('title', form.property_title)
 
       setMsg('تم إضافة الحريف والدار توّة غير معروضة للزوار ✓')
-      setForm({ nom: '', telephone: '', cin: '', property_title: '' })
+      setForm({ nom: '', telephone: '', cin: '', property_title: '', date_debut: '' })
       setTimeout(() => router.push('/confirmer-clients'), 1000)
     }
     setLoading(false)
@@ -108,6 +109,7 @@ export default function AjouterClientPage() {
             <option key={i} value={p.title}>{p.title}</option>
           ))}
         </select>
+        <input name="date_debut" type="date" value={form.date_debut} onChange={handleChange} style={inputStyle} />
 
         <button type="submit" disabled={loading} style={{ background: 'var(--ink)', color: '#fff', border: 'none', padding: 14, cursor: 'pointer', fontSize: '0.95rem' }}>
           {loading ? 'جاري الإضافة...' : 'إضافة الحريف'}
