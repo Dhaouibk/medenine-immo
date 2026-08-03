@@ -98,8 +98,16 @@ export default function ConfirmerClientsPage() {
               <strong>{c.nom}</strong>
               <div style={{ fontSize: '0.85rem', color: 'var(--soft)' }}>
                 📞 {c.telephone} · CIN: {c.cin} · 🏠 {c.property_title}
-                {c.date_debut && ` · 📅 ${new Date(c.date_debut).toLocaleDateString('fr-FR')}`}
+                {c.date_debut && ` · 📅 بداية: ${new Date(c.date_debut).toLocaleDateString('fr-FR')}`}
                 {' · '}<strong>{c.mois_payes || 0} شهر مدفوع</strong>
+                {c.date_debut && (
+                  <>
+                    {' · '}
+                    <span style={{ color: 'var(--accent)' }}>
+                      📆 الاستحقاق الجاي: {getNextDueDate(c.date_debut, c.mois_payes || 0)}
+                    </span>
+                  </>
+                )}
               </div>
             </div>
             <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
@@ -129,4 +137,9 @@ export default function ConfirmerClientsPage() {
 const inputStyle = {
   padding: 10, border: '1px solid var(--line)', background: 'var(--bg)',
   fontFamily: 'inherit', fontSize: '0.9rem', width: '100%'
+}
+function getNextDueDate(dateDebut, moisPayes) {
+  const d = new Date(dateDebut)
+  d.setMonth(d.getMonth() + moisPayes + 1)
+  return d.toLocaleDateString('fr-FR')
 }
