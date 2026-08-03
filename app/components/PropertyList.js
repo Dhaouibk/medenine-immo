@@ -1,21 +1,62 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { supabase } from '../lib/supabase'
 
-export default function PropertyList({ properties, t }) {
+const PAGE_SIZE = 20
+
+export default function PropertyList({ t }) {
   const [op, setOp] = useState('')
   const [quartier, setQuartier] = useState('')
   const [keyword, setKeyword] = useState('')
+
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [hasMore, setHasMore] = useState(true)
+  const [quartiers, setQuartiers] = useState([])
+
   const [galleryProperty, setGalleryProperty] = useState(null)
   const [galleryIndex, setGalleryIndex] = useState(0)
 
-  const quartiers = [...new Set(properties.map(p => p.quartier))]
+  // نجيب قائمة الحومات مرة وحدة
+  useEffect(() => {
+    supabase.from('proprieties').select('quartier').eq('disponible', true).then(({ data }) => {
+      if (data) setQuartiers([...new Set(data.map(d => d.quartier))])
+    })
+  }, [])
 
-  const filtered = properties.filter(p => {
-    if (op && p.operation !== op) return false
-    if (quartier && p.quartier !== quartier) return false
-    if (keyword && !p.title.toLowerCase().includes(keyword.toLowerCase())) return false
-    return true
-  })
+  const fetchPage = useCallback(async (from) => {
+    let query = supabase
+      .from('proprieties')
+      .select('*')
+      .eq('disponible', true)
+      .range(from, from + PAGE_SIZE - 1)
+
+    if (op) query = query.eq('operation', op)
+    if (quartier) query = query.eq('quartier', quartier)
+    if (keyword) query = query.ilike('title', `%${keyword}%`)
+
+    const { data, error } = await query
+    return error ? [] : data
+  }, [op, quartier, keyword])
+
+  // كي تتبدل الفلاتر، نبدا من جديد
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    fetchPage(0).then(data => {
+      if (cancelled) return
+      setItems(data)
+      setHasMore(data.length === PAGE_SIZE)
+      setLoading(false)
+    })
+    return () => { cancelled = true }
+  }, [fetchPage])
+
+  async function loadMore() {
+    const data = await fetchPage(items.length)
+    setItems(prev => [...prev, ...data])
+    setHasMore(data.length === PAGE_SIZE)
+  }
 
   function getImages(p) {
     if (p.images && p.images.length > 0) return p.images
@@ -27,17 +68,12 @@ export default function PropertyList({ properties, t }) {
     setGalleryProperty(p)
     setGalleryIndex(0)
   }
-
-  function closeGallery() {
-    setGalleryProperty(null)
-  }
-
+  function closeGallery() { setGalleryProperty(null) }
   function nextImage(e) {
     e.stopPropagation()
     const imgs = getImages(galleryProperty)
     setGalleryIndex((galleryIndex + 1) % imgs.length)
   }
-
   function prevImage(e) {
     e.stopPropagation()
     const imgs = getImages(galleryProperty)
@@ -65,15 +101,15 @@ export default function PropertyList({ properties, t }) {
           onChange={e => setKeyword(e.target.value)}
           style={{ padding: 9, border: '1px solid var(--line)', background: 'var(--bg)', flex: 1, minWidth: 160 }}
         />
-
-        <span style={{ fontSize: '0.82rem', color: 'var(--soft)' }}>{filtered.length} {t.property}</span>
       </div>
 
-      {filtered.length === 0 ? (
+      {loading ? (
+        <p style={{ color: 'var(--soft)' }}>...</p>
+      ) : items.length === 0 ? (
         <div className="empty">{t.noResults}</div>
       ) : (
         <div>
-          {filtered.map((p) => {
+          {items.map((p) => {
             const imgs = getImages(p)
             return (
               <div className="listing" key={p.id} onClick={() => openGallery(p)} style={{ cursor: 'pointer' }}>
@@ -108,10 +144,20 @@ export default function PropertyList({ properties, t }) {
               </div>
             )
           })}
+
+          {hasMore && (
+            <div style={{ textAlign: 'center', marginTop: 24 }}>
+              <button
+                onClick={loadMore}
+                style={{ border: '1px solid var(--line)', background: 'none', padding: '12px 30px', cursor: 'pointer', fontSize: '0.9rem' }}
+              >
+                عرض المزيد
+              </button>
+            </div>
+          )}
         </div>
       )}
 
-      {/* معرض الصور (Modal) */}
       {galleryProperty && (
         <div
           onClick={closeGallery}
